@@ -1,0 +1,72 @@
+[
+	{
+		"key": "sb",
+		"value": "KvAxaeQG-sp1euKMs4IrJyNe",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.569Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "wd",
+		"value": "1600x779",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "datr",
+		"value": "6dh0adIrUI6f7siplZ-CbqDh",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "c_user",
+		"value": "61586908959528",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "fr",
+		"value": "1Jten4V2NwBeBYN9b.AWeSjYiYNjCKPaQ-DYqPhC8PT3OGMKXO0fddS88JN5u6xrO-ScM.BpdgHM..AAA.0.0.BpdgfZ.AWeEtdrQxAYPF6BsJYGz-60WsTM",
+		"expires": "2026-04-25T12:08:57.000Z",
+		"maxAge": 7776000,
+		"domain": "facebook.com",
+		"path": "/",
+		"secure": true,
+		"httpOnly": true,
+		"extensions": [
+			"SameSite=None"
+		],
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "xs",
+		"value": "26%3Azlp43kLDsmhm-g%3A2%3A1769339962%3A-1%3A-1%3A%3AAczU31HtCjniLWEv97beHXfmvn4I81zohfpfzpkvSw",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	},
+	{
+		"key": "presence",
+		"value": "C%7B%22lm3%22%3A%22sc.7421160219512476797%22%2C%22t3%22%3A%5B%7B%22o%22%3A0%2C%22i%22%3A%22g.29764253159885334%22%7D%2C%7B%22o%22%3A0%2C%22i%22%3A%22sc.7421160219512476797%22%7D%2C%7B%22o%22%3A0%2C%22i%22%3A%22g.1227429982658215%22%7D%5D%2C%22utc3%22%3A1769342707993%2C%22v%22%3A1%7D",
+		"domain": "facebook.com",
+		"path": "/",
+		"hostOnly": false,
+		"creation": "2026-01-25T12:08:57.570Z",
+		"lastAccessed": "2026-01-25T12:08:58.394Z"
+	}
+]

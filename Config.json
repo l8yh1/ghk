@@ -1,0 +1,24 @@
+{
+  "author": "IMRAN",
+  "developermode": false,
+  "language": "en",
+  "approval": false,
+  "premium": false,
+  "BOTNAME": "─⃝͎̽𝗠𖦜.𝗹ə⃪໋⃔͜͡𝚾⃟⃗ʌ⃕ɨ𝗡🦇𝆺𝅥⃝𝗦✬",
+  "EMAIL": "sanjivfresh@gmail.com",
+  "PREFIX": "!",
+  "OPERATOR": [
+    "100076350514454",
+    "61583680184127"
+  ],
+  "ADMINBOT": [
+    "61583680184127",
+    "100002433418073"
+  ],
+  "OWNER": [
+    "100075122837809"
+  ],
+  "disabledcmds": [],
+  "disabledevents": [],
+  "note": "Don’t change owner uid or author name"
+}
