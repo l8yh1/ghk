@@ -6,7 +6,7 @@ module.exports.config = {
   permission: 0,
   credits: "IMRAN",
   description: "Chat with Gemini AI (with Chat History)",
-  prefix: false,
+  prefix: true,
   category: "ai",
   usages: "ai [your message]",
   cooldowns: 5
