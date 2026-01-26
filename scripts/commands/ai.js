@@ -1,19 +1,24 @@
-const axios = require("axios");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 module.exports.config = {
   name: "ai",
-  version: "1.1.0",
+  version: "1.2.0",
   permission: 0,
-  credits: "IMRAN / Gemini",
-  description: "Chat with Google Gemini AI",
-  prefix: true,
-  category: "chatgpt",
+  credits: "IMRAN",
+  description: "Chat with Gemini AI (with Chat History)",
+  prefix: false,
+  category: "ai",
   usages: "ai [your message]",
   cooldowns: 5
 };
 
+// Use your key here
 const API_KEY = "AIzaSyCBCetzRC6TnLdYvf2hhsHCpbejJ1rjJ-Y";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+// This stores the conversation history for each person/group
+const chatSessions = new Map();
 
 const cuteReplies = [
   "ماينوس معاك اصاحبي 🦔",
@@ -21,16 +26,6 @@ const cuteReplies = [
   "اهلا ماينوس معك يعاونك ا صاحبي",
   "ارررررر شوفني حي"
 ];
-
-const replyMap = new Map();
-
-async function getGeminiResponse(prompt) {
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }]
-  };
-  const res = await axios.post(GEMINI_URL, payload);
-  return res.data.candidates[0].content.parts[0].text;
-}
 
 module.exports.run = async function ({ api, event, args }) {
   const { threadID, messageID, senderID } = event;
@@ -42,35 +37,43 @@ module.exports.run = async function ({ api, event, args }) {
   }
 
   try {
-    const botReply = await getGeminiResponse(query);
-    api.sendMessage(botReply, threadID, (err, info) => {
-      if (!err) {
-        if (!replyMap.has(threadID)) replyMap.set(threadID, []);
-        replyMap.get(threadID).push({ messageID: info.messageID, author: senderID });
-      }
-    }, messageID);
+    let chat = chatSessions.get(threadID);
+    if (!chat) {
+      chat = model.startChat({ history: [] });
+      chatSessions.set(threadID, chat);
+    }
+
+    const result = await chat.sendMessage(query);
+    const response = await result.response;
+    const botReply = response.text();
+
+    api.sendMessage(botReply, threadID, messageID);
   } catch (e) {
-    console.error("Gemini API Error:", e.response ? e.response.data : e.message);
-    api.sendMessage("❌ AI service is currently unavailable.", threadID, messageID);
+    console.error("Gemini Error:", e);
+    api.sendMessage("❌ AI is unavailable.", threadID, messageID);
   }
 };
 
 module.exports.handleEvent = async function ({ api, event }) {
-  const { threadID, messageID, senderID, body, messageReply } = event;
+  const { threadID, messageID, body, messageReply } = event;
 
-  if (!messageReply || !replyMap.has(threadID)) return;
-
-  const replies = replyMap.get(threadID);
-  const isBotReply = replies.find(item => item.messageID === messageReply.messageID);
-
-  if (!isBotReply) return;
+  // Only trigger if the user is replying to the BOT's message
+  if (!messageReply || messageReply.senderID != api.getCurrentUserID()) return;
+  if (!body) return;
 
   try {
-    const botReply = await getGeminiResponse(body);
-    api.sendMessage(botReply, threadID, (err, info) => {
-      if (!err) replies.push({ messageID: info.messageID, author: senderID });
-    }, messageID);
+    let chat = chatSessions.get(threadID);
+    if (!chat) {
+      chat = model.startChat({ history: [] });
+      chatSessions.set(threadID, chat);
+    }
+
+    const result = await chat.sendMessage(body);
+    const response = await result.response;
+    const botReply = response.text();
+
+    api.sendMessage(botReply, threadID, messageID);
   } catch (e) {
-    api.sendMessage("❌ Error connecting to AI.", threadID, messageID);
+    console.error("AI Reply Error:", e);
   }
 };
