@@ -2,10 +2,10 @@ const axios = require("axios");
 
 module.exports.config = {
   name: "ai",
-  version: "3.0.0",
+  version: "4.0.0",
   permission: 0,
   credits: "IMRAN",
-  description: "Chat with Minus AI (Railway Optimized)",
+  description: "Chat with Minus AI (Anti-Block Mode)",
   prefix: false,
   category: "ai",
   usages: "ai [message]",
@@ -16,31 +16,33 @@ module.exports.run = async function ({ api, event, args }) {
   const { threadID, messageID } = event;
   const query = args.join(" ");
 
-  if (!query) return api.sendMessage("كيراك ا صاحبي ماينوس معك🦔، قولي واش راك حاب تسقسي؟", threadID, messageID);
+  if (!query) return api.sendMessage("كيراك ا صاحبي ماينوس معك🦔، قولي واش عندك؟", threadID, messageID);
 
   try {
-    // نستخدم هنا رابط API سريع جداً ولا يحتاج مفاتيح ومفتوح لسيرفرات Railway
-    const res = await axios.get(`https://api.sandipbaruwal.com/gemini?prompt=${encodeURIComponent(query)}`);
+    // محاولة استخدام رابط API هندي/عالمي معروف باستقراره مع Railway
+    const res = await axios.get(`https://deku-rest-api.gleeze.com/api/gpt-4?q=${encodeURIComponent(query)}`);
     
-    // تأكدنا من جلب النص الصحيح من السيرفر
-    let botReply = res.data.answer || res.data.reply || res.data.response;
+    let botReply = res.data.result || res.data.response || res.data.reply;
 
-    if (!botReply) throw new Error("Empty response");
+    if (!botReply) throw new Error("No data");
 
-    // إضافة لمسة "ماينوس" الخاصة بالشباب
-    const emojis = ["🦔", "🔥", "✨", "🤖", "💨"];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    
-    return api.sendMessage(`${botReply} ${randomEmoji}`, threadID, messageID);
+    return api.sendMessage(botReply, threadID, messageID);
 
   } catch (e) {
-    // محاولة أخيرة برابط احتياطي مختلف تماماً
     try {
-      const backupRes = await axios.get(`https://smty-api.vercel.app/api/gpt4?query=${encodeURIComponent(query)}`);
-      return api.sendMessage(backupRes.data.result + " ⚡", threadID, messageID);
-    } catch (err) {
-      console.error(e);
-      return api.sendMessage("❌ يا صاحبي السيرفرات اليوم راهي دايرة حالة، عاود جرب بعد دقيقة برك!", threadID, messageID);
+      // إذا فشل الأول، نستخدم هذا الرابط الذي يعمل كـ "بروكسي"
+      const res2 = await axios.get(`https://api.kenliejugarap.com/blackbox/?text=${encodeURIComponent(query)}`);
+      let reply2 = res2.data.response;
+      
+      return api.sendMessage(reply2, threadID, messageID);
+    } catch (e2) {
+      // المحاولة الأخيرة: رابط Gemini مختلف
+      try {
+         const res3 = await axios.get(`https://api.maher-zubair.tech/ai/gemini?q=${encodeURIComponent(query)}`);
+         return api.sendMessage(res3.data.result, threadID, messageID);
+      } catch (e3) {
+         return api.sendMessage("ارقد مراحش نخدم تا حاجة", threadID, messageID);
+      }
     }
   }
 };
@@ -48,7 +50,5 @@ module.exports.run = async function ({ api, event, args }) {
 module.exports.handleEvent = async function ({ api, event }) {
   const { threadID, messageID, body, messageReply } = event;
   if (!messageReply || messageReply.senderID != api.getCurrentUserID() || !body) return;
-  
-  // تشغيل الأمر عند الرد
   module.exports.run({ api, event, args: body.split(" ") });
 };
