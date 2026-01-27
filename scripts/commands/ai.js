@@ -46,7 +46,7 @@ module.exports.run = async function ({ api, event, args }) {
 
     return api.sendMessage(botReply, threadID, messageID);
   } catch (e) {
-    return api.sendMessage("❌ السيرفر في Railway محظور من جوجل. جرب تسألني سؤال آخر!", threadID, messageID);
+    return api.sendMessage("❌", threadID, messageID);
   }
 };
 
