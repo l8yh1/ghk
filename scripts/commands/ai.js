@@ -2,10 +2,10 @@ const axios = require("axios");
 
 module.exports.config = {
   name: "ai",
-  version: "2.1.0",
+  version: "2.5.0",
   permission: 0,
   credits: "IMRAN",
-  description: "Chat with Minus AI (No-Key Mode)",
+  description: "Chat with Minus AI (Multi-Source Mode)",
   prefix: false,
   category: "ai",
   usages: "ai [message]",
@@ -20,38 +20,59 @@ module.exports.run = async function ({ api, event, args }) {
 
   if (!query) return api.sendMessage("كيراك ا صاحبي ماينوس معك🦔", threadID, messageID);
 
+  // إعداد ذاكرة بسيطة
+  if (!chatHistory.has(threadID)) {
+    chatHistory.set(threadID, []);
+  }
+  const history = chatHistory.get(threadID);
+
   try {
-    if (!chatHistory.has(threadID)) {
-      chatHistory.set(threadID, [{ role: "user", content: "اسمك هو ماينوس. مطورك هو ياسين. أصدقاؤك هم سايم، ساي، جمال، وموزان. تحدث بلهجة عربية عامية خفيفة وكن مرحاً." }]);
+    let botReply = "";
+
+    // --- المصدر الأول: Kaiz API (مستقر جداً لبوتات فيسبوك) ---
+    try {
+      const res = await axios.get(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(query)}`);
+      botReply = res.data.response;
+    } catch (err) {
+      // --- المصدر الثاني: إذا فشل الأول، نجرب API بديل لـ Gemini ---
+      try {
+        const res = await axios.get(`https://kaiz-apis.gleeze.com/api/gemini?ask=${encodeURIComponent(query)}`);
+        botReply = res.data.response;
+      } catch (err2) {
+        // --- المصدر الثالث: API عام مفتوح ---
+        const res = await axios.get(`https://api.shayan-ai.workers.dev/chat?q=${encodeURIComponent(query)}`);
+        botReply = res.data.answer || res.data.response;
+      }
     }
-    const history = chatHistory.get(threadID);
-    history.push({ role: "user", content: query });
 
-    // استخدام بروكساي API مجاني للوصول لـ GPT-4o-mini أو Llama
-    // هذا الرابط يعمل كبديل ممتاز ولا يحتاج تسجيل دخول
-    const response = await axios.post("https://api.pawan.krd/v1/chat/completions", {
-      model: "gpt-4o-mini",
-      messages: history
-    }, {
-      headers: { "Authorization": "Bearer pk-***" } // سنستخدم API عام أو رابط بديل
-    }).catch(async () => {
-        // إذا فشل الرابط الأول، نستخدم رابط "KAIZ" المحدث الذي يعمل بـ axios
-        return await axios.get(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(query)}`);
-    });
+    if (!botReply) throw new Error("No response from any source");
 
-    const botReply = response.data.choices ? response.data.choices[0].message.content : response.data.response;
+    // إضافة الشخصية يدوياً في البداية إذا كان الرد جافاً
+    if (history.length === 0) {
+      botReply = "مرحباً! أنا ماينوس صديق ياسين والشباب.. " + botReply;
+    }
 
-    history.push({ role: "assistant", content: botReply });
-    if (history.length > 10) history.splice(1, 2);
+    // تحديث الذاكرة
+    history.push({ q: query, a: botReply });
+    if (history.length > 5) history.shift();
 
     return api.sendMessage(botReply, threadID, messageID);
+
   } catch (e) {
-    return api.sendMessage("❌", threadID, messageID);
+    console.error(e);
+    return api.sendMessage("❌ والله يا صاحبي السيرفرات كلها تعبانة حاليا.", threadID, messageID);
   }
 };
 
 module.exports.handleEvent = async function ({ api, event }) {
   const { threadID, messageID, body, messageReply } = event;
   if (!messageReply || messageReply.senderID != api.getCurrentUserID() || !body) return;
+  
+  // تشغيل الأمر عند الرد (Reply)
   module.exports.run({ api, event, args: body.split(" ") });
 };
+
+
+
+
+
